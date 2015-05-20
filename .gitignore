@@ -1,0 +1,13 @@
+# Idea
+.idea
+*.iml
+
+# Other
+node_modules
+logs
+project/project
+project/target
+target
+tmp
+dist
+.cache
