@@ -17,7 +17,7 @@ trait ReactElement {
    * Gets properties to render.
    * @return
    */
-  def props: Map[String, Any]
+  def props: Map[String, Any] = Map()
 
   /**
    * Creates render request.

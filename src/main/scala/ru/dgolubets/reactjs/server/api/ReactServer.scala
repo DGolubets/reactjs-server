@@ -74,6 +74,11 @@ class ReactServer(loaderFactory: => ScriptModuleLoader,
   def shutdown() = system.shutdown()
 }
 
+object ReactServer {
+  def apply(loaderFactory: => ScriptModuleLoader) = new ReactServer(loaderFactory)
+  def apply(loaderFactory: => ScriptModuleLoader, customConfig: Config) = new ReactServer(loaderFactory, customConfig)
+}
+
 
 
 

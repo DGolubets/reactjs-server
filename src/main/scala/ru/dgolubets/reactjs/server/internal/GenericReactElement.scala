@@ -7,4 +7,4 @@ import ru.dgolubets.reactjs.server.api.{ReactClass, ReactElement}
  * @param reactClass
  * @param props
  */
-private[server] case class GenericReactElement(reactClass: ReactClass, props: Map[String, Any]) extends ReactElement
+private[server] case class GenericReactElement(reactClass: ReactClass, override val props: Map[String, Any]) extends ReactElement
