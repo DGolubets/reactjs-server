@@ -1,6 +1,11 @@
 # reactjs-server
 Renders React.js classes with Nashorn in JVM
 
+## Setup
+```
+libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.1.0"
+```
+
 ## Usage
 The easy way is to use ReactServer class. It uses Akka to create a simple routing system with few render actors (defaults to the number of CPU cores). It creates daemonic actor system that won't block JVM from exiting. However you may want to shut it down explicitly, e.g. when you work with Play recompilation.
 ```scala
