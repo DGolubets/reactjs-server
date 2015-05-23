@@ -46,7 +46,7 @@ class RenderActorBehaviorSpec extends WordSpec with Matchers with MockFactory wi
         inSequence {
 
           (loaderMock.requireAsync(_: Seq[String]))
-            .expects(Seq("React", renderRequest.module))
+            .expects(Seq("react", renderRequest.module))
             .returns(Future.successful(Seq(ScriptModule(null), ScriptModule(null))))
 
           // async renderer should lock loader before rendering
@@ -78,7 +78,7 @@ class RenderActorBehaviorSpec extends WordSpec with Matchers with MockFactory wi
         inSequence {
 
           (loaderMock.requireAsync(_: Seq[String]))
-            .expects(Seq("React", renderRequest.module))
+            .expects(Seq("react", renderRequest.module))
             .returns(Future.successful(Seq(ScriptModule(null), ScriptModule(null))))
 
           // async renderer should lock loader before rendering
@@ -115,7 +115,7 @@ class RenderActorBehaviorSpec extends WordSpec with Matchers with MockFactory wi
         val renderRequest = RenderActor.Request("SomeClass", None, Map("prop1" -> "val1"))
         val expectedResponse = RenderActor.Response("<div></div>")
 
-        (loaderMock.require(_: String)).expects("React").returns(Success(ScriptModule(null)))
+        (loaderMock.require(_: String)).expects("react").returns(Success(ScriptModule(null)))
         (loaderMock.require(_: String)).expects(renderRequest.module).returns(Success(ScriptModule(null)))
 
         (renderLogicMock.render _).expects(where {case _ => true}).returns(Success(expectedResponse.html))
@@ -139,7 +139,7 @@ class RenderActorBehaviorSpec extends WordSpec with Matchers with MockFactory wi
         val renderer = TestActorRef(new RenderActor(loaderMock, renderLogicMock))
         val renderRequest = RenderActor.Request("SomeClass", None, Map("prop1" -> "val1"))
 
-        (loaderMock.require(_: String)).expects("React").returns(Success(ScriptModule(null)))
+        (loaderMock.require(_: String)).expects("react").returns(Success(ScriptModule(null)))
         (loaderMock.require(_: String)).expects(renderRequest.module).returns(Success(ScriptModule(null)))
 
         (renderLogicMock.render _).expects(where {case _ => true}).returns(Failure(new Exception("Some error")))

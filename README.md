@@ -10,8 +10,10 @@ futureString.onComplete {
   case _ => engine.shutdown()
 }
 ```
+It looks for a module with absolute id 'react', so it should be available to the loader.
 
-There are two ways of declaring React elements. First is to implement ReactElement trait.
+### Declaring React elements
+One way is to implement ReactElement trait.
 ```scala
 case class CommentBox(url: String, pollingInterval: Int) extends ReactElement {
   override val reactClass = ReactClass("./components/CommentBox")

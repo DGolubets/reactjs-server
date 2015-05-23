@@ -30,7 +30,7 @@ class RenderActor private[actors] (moduleLoader: ScriptModuleLoader, renderLogic
    */
   private def asyncRenderer(asyncLoader: AsyncScriptModuleLoader): Receive = {
     case r: Request =>
-      val htmlFuture = asyncLoader.requireAsync(Seq("React", r.module)).map {
+      val htmlFuture = asyncLoader.requireAsync(Seq(reactModuleName, r.module)).map {
         case Seq(react, reactClass) =>
           // synchronisation is required cos we access native nashorn objects here
           moduleLoader.lock {
@@ -49,7 +49,7 @@ class RenderActor private[actors] (moduleLoader: ScriptModuleLoader, renderLogic
   private def syncRenderer(syncLoader: SyncScriptModuleLoader): Receive = {
     case r: Request =>
       try {
-        val react = syncLoader.require("React").get
+        val react = syncLoader.require(reactModuleName).get
         val reactClass = syncLoader.require(r.module).get
         val html = renderLogic.render(syncLoader.engine, react, reactClass, r.export, r.props).get
         sender() ! Response(html)
@@ -66,6 +66,9 @@ class RenderActor private[actors] (moduleLoader: ScriptModuleLoader, renderLogic
 }
 
 object RenderActor {
+
+  private[actors] val reactModuleName = "react"
+
   /**
    * Configuration for RenderActor.
    *
