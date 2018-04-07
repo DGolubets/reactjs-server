@@ -71,7 +71,7 @@ class ReactServer(loaderFactory: => ScriptModuleLoader,
    * Though it may be necessary to stop the server along, without exiting JVM.
    * That's why this method does exist.
    */
-  def shutdown() = system.shutdown()
+  def shutdown(): Unit = system.terminate()
 }
 
 object ReactServer {

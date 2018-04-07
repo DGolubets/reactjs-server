@@ -13,6 +13,9 @@ import scala.language.postfixOps
  * Integration tests for RenderActor actor.
  */
 class RenderActorIntegrationSpec extends WordSpec with ActorSpecLike with Matchers {
+
+  val timeout = 10 seconds
+
   "RenderActor" when {
 
     "using AMD" should {
@@ -24,12 +27,12 @@ class RenderActorIntegrationSpec extends WordSpec with ActorSpecLike with Matche
 
       "render" in new AmdTest {
         renderer ! RenderActor.Request("CommentBox", None, Map("prop1" -> "val1"))
-        expectMsgType[RenderActor.Response](10 seconds)
+        expectMsgType[RenderActor.Response](timeout)
       }
 
       "fail on error" in new AmdTest {
         renderer ! RenderActor.Request("NonExistentModule", None, Map("prop1" -> "val1"))
-        expectMsgType[Status.Failure](10 seconds)
+        expectMsgType[Status.Failure](timeout)
       }
     }
 
@@ -42,12 +45,12 @@ class RenderActorIntegrationSpec extends WordSpec with ActorSpecLike with Matche
 
       "render" in new CommonJsTest {
         renderer ! RenderActor.Request("CommentBox", None, Map("prop1" -> "val1"))
-        expectMsgType[RenderActor.Response](10 seconds)
+        expectMsgType[RenderActor.Response](timeout)
       }
 
       "fail on error" in new CommonJsTest {
         renderer ! RenderActor.Request("NonExistentModule", None, Map("prop1" -> "val1"))
-        expectMsgType[Status.Failure](10 seconds)
+        expectMsgType[Status.Failure](timeout)
       }
     }
   }

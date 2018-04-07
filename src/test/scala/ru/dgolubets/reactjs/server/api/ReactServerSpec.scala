@@ -1,9 +1,7 @@
 package ru.dgolubets.reactjs.server.api
 
-import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time._
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{AsyncWordSpec, Matchers}
 import ru.dgolubets.jsmoduleloader.api.amd.AmdLoader
 import ru.dgolubets.jsmoduleloader.api.commonjs.CommonJsLoader
 import ru.dgolubets.jsmoduleloader.api.readers.FileModuleReader
@@ -14,8 +12,7 @@ import scala.concurrent.Future
 /**
  * ReactServer tests.
  */
-class ReactServerSpec extends WordSpec with Matchers with ScalaFutures {
-  import scala.concurrent.ExecutionContext.Implicits.global
+class ReactServerSpec extends AsyncWordSpec with Matchers with ScalaFutures {
 
   "ReactServer" when {
     "uses AMD loader" should {
@@ -26,14 +23,10 @@ class ReactServerSpec extends WordSpec with Matchers with ScalaFutures {
           engine.render(CommentBox("http://comments.org", 1000))
         }
 
-        val result = Future.sequence(requests)
-        result.onComplete {
-          case _ => engine.shutdown()
+        Future.sequence(requests).map { _ =>
+          engine.shutdown()
+          succeed
         }
-
-        whenReady(result, Timeout(Span(60, Seconds))){ _ =>
-        }
-
       }
     }
 
@@ -45,14 +38,10 @@ class ReactServerSpec extends WordSpec with Matchers with ScalaFutures {
           engine.render(CommentBox("http://comments.org", 1000))
         }
 
-        val result = Future.sequence(requests)
-        result.onComplete {
-          case _ => engine.shutdown()
+        Future.sequence(requests).map { _ =>
+          engine.shutdown()
+          succeed
         }
-
-        whenReady(result, Timeout(Span(60, Seconds))){ _ =>
-        }
-
       }
     }
   }
