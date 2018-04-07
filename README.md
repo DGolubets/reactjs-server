@@ -3,7 +3,8 @@ Renders React.js classes with Nashorn in JVM
 
 ## Setup
 ```
-libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.1.0"
+resolvers += Resolver.bintrayRepo("dgolubets", "releases")
+libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.1.1"
 ```
 
 ## Usage
