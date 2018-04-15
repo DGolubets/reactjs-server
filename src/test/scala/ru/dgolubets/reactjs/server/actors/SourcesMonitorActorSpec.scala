@@ -108,7 +108,6 @@ class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers 
     "file has been removed" should {
 
       "notify server" in {
-        println("TEST")
         val probe = TestProbe()
         val files = List(
           new File(tempDir.toFile, "file1"),

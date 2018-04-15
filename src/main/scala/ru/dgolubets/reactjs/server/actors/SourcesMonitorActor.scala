@@ -3,20 +3,36 @@ package ru.dgolubets.reactjs.server.actors
 import java.io.File
 import java.nio.file.{Path, WatchEvent}
 
-import akka.actor.{Actor, ActorRef, Props}
+import scala.concurrent.duration._
+
+import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import better.files.{File => BetterFile}
+
 import ru.dgolubets.reactjs.server.util.{ExecutionContexts, FileMonitorEx}
 
-import scala.concurrent.duration.FiniteDuration
-
 private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: Seq[File], delay: FiniteDuration) extends Actor {
+
+  import context.dispatcher
 
   import Messages._
   import SourcesMonitorActor._
 
   private val watcher = new FileMonitorEx(root, recursive = true) {
+
+    private val scheduler = context.system.scheduler
+    private var scheduledNotification: Option[Cancellable] = None
+
     override def onEvent(eventType: WatchEvent.Kind[Path], file: BetterFile, count: Int): Unit = {
-      self ! FileChanged
+
+      for (n <- scheduledNotification) {
+        n.cancel()
+      }
+
+      val c = scheduler.scheduleOnce(delay) {
+        self ! FileChanged
+      }
+
+      scheduledNotification = Some(c)
     }
   }
 
@@ -55,7 +71,7 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
         }
         .keys
         .toList
-      if(previous.isEmpty || updatedFiles.nonEmpty) {
+      if (previous.isEmpty || updatedFiles.nonEmpty) {
         server ! SourcesChanged(updatedFiles)
       }
     }
@@ -65,6 +81,7 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
     case FileChanged =>
       val newFilesModified = getFilesModified()
       val oldFilesModified = filesModified
+
       if (oldFilesModified != newFilesModified) {
         filesModified = newFilesModified
         notifyServer(newFilesModified, Some(oldFilesModified))
