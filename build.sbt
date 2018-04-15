@@ -2,7 +2,7 @@ import Dependencies._
 
 name := "reactjs-server"
 
-organization := "ru.dgolubets.reactjs.server.dgolubets"
+organization := "ru.dgolubets"
 
 scalaVersion := "2.12.4"
 crossScalaVersions := List("2.11.6", "2.12.4")

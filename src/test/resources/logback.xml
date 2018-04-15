@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="ru.dgolubets.jsmoduleloader" level="OFF" />
+    <logger name="ru.dgolubets.reactjs.server.script.ScriptContext" level="ERROR" />
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
