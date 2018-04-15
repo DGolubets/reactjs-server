@@ -46,7 +46,10 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
     else {
       val updatedFiles = previous
         .fold(current) { prev =>
-          current.filter { case (k, Some(v)) => prev.get(k).forall(_.forall(_ < v)) }
+          current.filter {
+            case (k, Some(v)) => prev.get(k).forall(_.forall(_ < v))
+            case _ => false
+          }
         }
         .keys
         .toList
