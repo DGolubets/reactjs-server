@@ -25,6 +25,7 @@ private[server] class RenderActor private[actors](sources: Seq[ScriptSource]) ex
 
   override def receive: Receive = {
     case RenderRequest(functionName, state) =>
+      log.debug(s"Render request ($functionName, $state)")
       val result = Try {
         scriptContext.eval(s"$functionName($state)").asString()
       }.toEither

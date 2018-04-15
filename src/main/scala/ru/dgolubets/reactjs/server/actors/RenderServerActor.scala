@@ -45,7 +45,11 @@ private[server] class RenderServerActor(settings: RenderServerSettings) extends 
       context.stop(r)
     }
 
-    val newRouter = context.actorOf(RoundRobinPool(settings.nInstances).props(RenderActor.props(settings.sources)))
+    val newRouter = context.actorOf(
+      RoundRobinPool(settings.nInstances)
+      .props(RenderActor
+        .props(settings.sources)
+      ))
     context.watch(newRouter)
     router = Some(newRouter)
   }
@@ -59,6 +63,7 @@ private[server] class RenderServerActor(settings: RenderServerSettings) extends 
 
   private def waitingHandler: Receive = {
     case request: RenderRequest =>
+      log.warning(s"Stashing request..")
       stash()
   }
 
@@ -81,6 +86,7 @@ private[server] class RenderServerActor(settings: RenderServerSettings) extends 
       context.become(waiting)
     case Terminated(a) =>
       if (router.contains(a)) {
+        log.debug(s"Router terminated")
         context.become(waiting)
       }
   }
