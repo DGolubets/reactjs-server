@@ -12,11 +12,11 @@ private[server] class RenderServerActor(settings: RenderServerSettings) extends 
 
   private var router: Option[ActorRef] = None
 
-  private val monitor: Option[ActorRef] = settings.watch.map { root =>
+  private val monitor: Option[ActorRef] = settings.watch.map { watchSettings =>
     val files = settings.sources.collect {
       case FileScriptSource(file, _) => file
     }
-    context.actorOf(SourcesMonitorActor.props(self, root, files))
+    context.actorOf(SourcesMonitorActor.props(self, watchSettings.root, files, watchSettings.delay))
   }
 
   override val supervisorStrategy = AllForOneStrategy(0) {
@@ -47,9 +47,9 @@ private[server] class RenderServerActor(settings: RenderServerSettings) extends 
 
     val newRouter = context.actorOf(
       RoundRobinPool(settings.nInstances)
-      .props(RenderActor
-        .props(settings.sources)
-      ))
+        .props(RenderActor
+          .props(settings.sources)
+        ))
     context.watch(newRouter)
     router = Some(newRouter)
   }

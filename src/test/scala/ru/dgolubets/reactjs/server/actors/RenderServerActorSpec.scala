@@ -3,11 +3,12 @@ package ru.dgolubets.reactjs.server.actors
 import java.io.File
 import java.nio.file.Files
 
+import scala.language.postfixOps
+
 import io.circe.Json
 import org.scalatest._
-import ru.dgolubets.reactjs.server._
 
-import scala.language.postfixOps
+import ru.dgolubets.reactjs.server._
 
 /**
   * Integration tests for RenderActor actor.
@@ -17,6 +18,7 @@ class RenderServerActorSpec extends WordSpec with ActorSpecLike with Matchers wi
   import Messages._
 
   val tempDir = Files.createTempDirectory("RenderServerActorSpec")
+  val watchSettings = WatchSettings(tempDir.toFile)
 
   val renderSource = ScriptSource.fromString(
     """
@@ -58,7 +60,7 @@ class RenderServerActorSpec extends WordSpec with ActorSpecLike with Matchers wi
 
         val sources = Seq(renderSource) ++ files.map(ScriptSource.fromFile(_))
 
-        disposableActor(RenderServerActor.props(RenderServerSettings(sources, watch = Some(tempDir.toFile)))) { server =>
+        disposableActor(RenderServerActor.props(RenderServerSettings(sources, watch = Some(watchSettings)))) { server =>
           server ! RenderRequest("render", Json.Null)
           expectNoMessage()
           for (f <- files) {
@@ -74,7 +76,7 @@ class RenderServerActorSpec extends WordSpec with ActorSpecLike with Matchers wi
 
         val sources = Seq(renderSource)
 
-        disposableActor(RenderServerActor.props(RenderServerSettings(sources, watch = Some(tempDir.toFile)))) { server =>
+        disposableActor(RenderServerActor.props(RenderServerSettings(sources, watch = Some(watchSettings)))) { server =>
 
           Thread.sleep(100) // wait for source monitor to report
 

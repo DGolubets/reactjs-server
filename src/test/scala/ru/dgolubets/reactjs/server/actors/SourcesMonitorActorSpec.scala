@@ -3,15 +3,18 @@ package ru.dgolubets.reactjs.server.actors
 import java.io.File
 import java.nio.file.Files
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 import akka.testkit.TestProbe
 import org.scalatest._
-import ru.dgolubets.reactjs.server.actors.Messages.{SourcesChanged, SourcesMissing}
 
-import scala.language.postfixOps
+import ru.dgolubets.reactjs.server.actors.Messages.{SourcesChanged, SourcesMissing}
 
 class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   val tempDir = Files.createTempDirectory("SourcesMonitorActorSpec")
+  val watchDelay = 0.1 seconds
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -30,7 +33,7 @@ class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers 
       "notify server of existing sources even if list is empty" in {
         val probe = TestProbe()
         val files = Nil
-        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files)) { _ =>
+        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files, watchDelay)) { _ =>
           probe.expectMsgPF() {
             case SourcesChanged(Nil) =>
           }
@@ -40,7 +43,7 @@ class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers 
       "notify server of missing sources" in {
         val probe = TestProbe()
         val files = List(new File(tempDir.toFile, "non_existing_file"))
-        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files)) { _ =>
+        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files, watchDelay)) { _ =>
           probe.expectMsgPF() {
             case SourcesMissing(`files`) =>
           }
@@ -57,7 +60,7 @@ class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers 
           new File(tempDir.toFile, "file2")
         )
 
-        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files)) { _ =>
+        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files, watchDelay)) { _ =>
 
           probe.expectMsgPF() {
             case SourcesMissing(`files`) =>
@@ -87,7 +90,7 @@ class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers 
           f.createNewFile()
         }
 
-        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files)) { _ =>
+        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files, watchDelay)) { _ =>
           probe.expectMsgPF() {
             case SourcesChanged(`files`) =>
           }
@@ -116,7 +119,7 @@ class SourcesMonitorActorSpec extends WordSpec with ActorSpecLike with Matchers 
           f.createNewFile()
         }
 
-        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files)) { _ =>
+        disposableActor(SourcesMonitorActor.props(probe.ref, tempDir.toFile, files, watchDelay)) { _ =>
           probe.expectMsgPF() {
             case SourcesChanged(`files`) =>
           }
