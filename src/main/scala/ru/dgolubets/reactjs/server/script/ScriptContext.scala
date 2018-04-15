@@ -19,7 +19,7 @@ private[server] object ScriptContext extends LazyLogging {
       GraalScriptContext()
     } catch {
       case e: Throwable =>
-        logger.warn(s"Cannot create Graal script context, falling back to Nashorn.", e)
+        logger.debug(s"Cannot create Graal script context, falling back to Nashorn.", e)
         NashornScriptContext()
     }
   }
