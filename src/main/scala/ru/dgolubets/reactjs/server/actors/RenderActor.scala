@@ -5,7 +5,7 @@ import ru.dgolubets.reactjs.server.script.{ScriptContext, ScriptSource}
 
 import scala.util.Try
 
-class RenderActor private[actors](sources: Seq[ScriptSource]) extends Actor with ActorLogging {
+private[server] class RenderActor private[actors](sources: Seq[ScriptSource]) extends Actor with ActorLogging {
 
   import Messages._
 
@@ -39,7 +39,7 @@ class RenderActor private[actors](sources: Seq[ScriptSource]) extends Actor with
   }
 }
 
-object RenderActor {
+private[server] object RenderActor {
 
   def props(sources: Seq[ScriptSource]): Props = Props(new RenderActor(sources))
 }

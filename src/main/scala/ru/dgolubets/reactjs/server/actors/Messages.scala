@@ -4,7 +4,7 @@ import java.io.File
 
 import io.circe.Json
 
-object Messages {
+private[server] object Messages {
 
   /**
     * Request to render a react.js markup.

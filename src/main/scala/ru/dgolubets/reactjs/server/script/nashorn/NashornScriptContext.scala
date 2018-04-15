@@ -6,7 +6,7 @@ import ru.dgolubets.reactjs.server.script.{ScriptContext, ScriptSource, ScriptVa
 
 import scala.language.implicitConversions
 
-class NashornScriptContext(engine: ScriptEngine) extends ScriptContext {
+private[server] class NashornScriptContext(engine: ScriptEngine) extends ScriptContext {
 
   import NashornScriptContext._
 
@@ -29,7 +29,7 @@ class NashornScriptContext(engine: ScriptEngine) extends ScriptContext {
   override def close(): Unit = {}
 }
 
-object NashornScriptContext {
+private[server] object NashornScriptContext {
 
   private implicit def wrapValue(value: AnyRef): ScriptValue = NashornScriptValue(value)
 

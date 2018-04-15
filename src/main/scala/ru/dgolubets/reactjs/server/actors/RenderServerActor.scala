@@ -6,7 +6,7 @@ import akka.routing.RoundRobinPool
 import ru.dgolubets.reactjs.server.RenderServerSettings
 import ru.dgolubets.reactjs.server.script.FileScriptSource
 
-class RenderServerActor(settings: RenderServerSettings) extends Actor with Stash with ActorLogging {
+private[server] class RenderServerActor(settings: RenderServerSettings) extends Actor with Stash with ActorLogging {
 
   import Messages._
 
@@ -98,6 +98,6 @@ class RenderServerActor(settings: RenderServerSettings) extends Actor with Stash
   override def receive: Receive = commonHandler
 }
 
-object RenderServerActor {
+private[server] object RenderServerActor {
   def props(settings: RenderServerSettings): Props = Props(new RenderServerActor(settings))
 }

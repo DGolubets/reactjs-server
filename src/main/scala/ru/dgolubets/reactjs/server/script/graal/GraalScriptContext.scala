@@ -5,7 +5,7 @@ import ru.dgolubets.reactjs.server.script.{ScriptContext, ScriptSource, ScriptVa
 
 import scala.language.implicitConversions
 
-class GraalScriptContext(context: Context) extends ScriptContext {
+private[server] class GraalScriptContext(context: Context) extends ScriptContext {
 
   import GraalScriptContext._
 
@@ -29,7 +29,7 @@ class GraalScriptContext(context: Context) extends ScriptContext {
   override def close(): Unit = context.close()
 }
 
-object GraalScriptContext {
+private[server] object GraalScriptContext {
 
   private val lang = "js"
 

@@ -1,5 +1,5 @@
 package ru.dgolubets.reactjs.server.script
 
-trait ScriptValue {
+private[server] trait ScriptValue {
   def asString(): String
 }

@@ -4,6 +4,6 @@ import java.util.concurrent.Executors
 
 import scala.concurrent.ExecutionContext
 
-object ExecutionContexts {
+private[server] object ExecutionContexts {
   val blockingIO: ExecutionContext = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 }

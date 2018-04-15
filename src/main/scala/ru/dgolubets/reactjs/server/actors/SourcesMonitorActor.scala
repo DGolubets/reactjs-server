@@ -7,7 +7,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import better.files.{File => BetterFile}
 import ru.dgolubets.reactjs.server.util.{ExecutionContexts, FileMonitorEx}
 
-class SourcesMonitorActor(server: ActorRef, root: File, files: Seq[File]) extends Actor {
+private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: Seq[File]) extends Actor {
 
   import Messages._
   import SourcesMonitorActor._
@@ -68,7 +68,7 @@ class SourcesMonitorActor(server: ActorRef, root: File, files: Seq[File]) extend
 }
 
 
-object SourcesMonitorActor {
+private[server] object SourcesMonitorActor {
   def props(server: ActorRef, root: File, files: Seq[File]): Props = Props(new SourcesMonitorActor(server, root, files))
 
   object FileChanged

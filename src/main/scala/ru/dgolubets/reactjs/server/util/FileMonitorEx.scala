@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 /**
   * FileMonitor with some fixes
   */
-class FileMonitorEx(root: File, recursive: Boolean = true)
+private[server] class FileMonitorEx(root: File, recursive: Boolean = true)
   extends FileMonitor(better.files.File(root.toPath), recursive) {
 
   override def start()(implicit executionContext: ExecutionContext): Unit = {
