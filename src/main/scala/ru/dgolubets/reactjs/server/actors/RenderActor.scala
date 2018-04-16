@@ -1,9 +1,10 @@
 package ru.dgolubets.reactjs.server.actors
 
-import akka.actor.{Actor, ActorLogging, Props}
-import ru.dgolubets.reactjs.server.script.{ScriptContext, ScriptSource}
+import scala.util.{Failure, Success, Try}
 
-import scala.util.Try
+import akka.actor.{Actor, ActorLogging, Props}
+
+import ru.dgolubets.reactjs.server.script.{ScriptContext, ScriptSource}
 
 private[server] class RenderActor private[actors](sources: Seq[ScriptSource]) extends Actor with ActorLogging {
 
@@ -28,7 +29,10 @@ private[server] class RenderActor private[actors](sources: Seq[ScriptSource]) ex
       log.debug(s"Render request ($functionName, $state)")
       val result = Try {
         scriptContext.eval(s"$functionName($state)").asString()
-      }.toEither
+      } match {
+        case Success(v) => Right(v)
+        case Failure(e) => Left(e)
+      }
 
       sender ! RenderResponse(result)
     case other =>
