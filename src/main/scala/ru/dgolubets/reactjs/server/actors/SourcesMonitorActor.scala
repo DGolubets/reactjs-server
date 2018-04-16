@@ -38,22 +38,23 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
 
   watcher.start()(ExecutionContexts.blockingIO)
 
-  private var filesModified: Map[File, Option[Long]] = getFilesModified()
+  private var filesModified: Map[File, Option[FileInfo]] = getFilesModified()
   notifyServer(filesModified, None)
 
   override def postStop(): Unit = {
     watcher.close()
   }
 
-  def getFilesModified(): Map[File, Option[Long]] = {
+  def getFilesModified(): Map[File, Option[FileInfo]] = {
     files.map { file =>
       if (file.exists()) {
-        file -> Some(file.lastModified())
+        val info = FileInfo(file.lastModified(), BetterFile(file.toPath).md5)
+        file -> Some(info)
       } else file -> None
     }.toMap
   }
 
-  def notifyServer(current: Map[File, Option[Long]], previous: Option[Map[File, Option[Long]]]): Unit = {
+  def notifyServer(current: Map[File, Option[FileInfo]], previous: Option[Map[File, Option[FileInfo]]]): Unit = {
     val missingFiles = current
       .collect { case (k, v) if v.isEmpty => k }
       .toList
@@ -65,7 +66,7 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
       val updatedFiles = previous
         .fold(current) { prev =>
           current.filter {
-            case (k, Some(v)) => prev.get(k).forall(_.forall(_ < v))
+            case (k, Some(v)) => prev.get(k).forall(_.forall(_ != v))
             case _ => false
           }
         }
@@ -96,4 +97,5 @@ private[server] object SourcesMonitorActor {
 
   object FileChanged
 
+  case class FileInfo(lastModified: Long, md5: String)
 }
