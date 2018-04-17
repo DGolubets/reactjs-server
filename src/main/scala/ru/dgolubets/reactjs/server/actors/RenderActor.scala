@@ -17,12 +17,16 @@ private[server] class RenderActor private[actors](sources: Seq[ScriptSource]) ex
   locally {
     scriptContext.exportSymbol("logger", log)
 
+    log.debug("Evaluating polyfills..")
     scriptContext.eval(ScriptSource.fromResource("ru.dgolubets.reactjs.server/polyfills/base.js"))
 
     for (source <- sources) {
+      log.debug(s"Evaluating $source..")
       scriptContext.eval(source)
     }
   }
+
+  log.debug(s"Initialized.")
 
   override def receive: Receive = {
     case RenderRequest(functionName, state) =>
@@ -33,14 +37,13 @@ private[server] class RenderActor private[actors](sources: Seq[ScriptSource]) ex
         case Success(v) => Right(v)
         case Failure(e) => Left(e)
       }
-
+      log.debug(s"Render result: $result")
       sender ! RenderResponse(result)
-    case other =>
-      log.error(s"Invalid message: $other")
   }
 
   override def postStop(): Unit = {
     scriptContext.close()
+    log.debug("Stopped RenderActor.")
   }
 }
 
