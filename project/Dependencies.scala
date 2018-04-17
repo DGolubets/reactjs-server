@@ -11,7 +11,7 @@ object Dependencies {
   }
 
   object Graal {
-    val sdk = "org.graalvm" % "graal-sdk" % "0.30"
+    val sdk = "org.graalvm" % "graal-sdk" % "1.0.0-rc1"
   }
 
   object Circe {
