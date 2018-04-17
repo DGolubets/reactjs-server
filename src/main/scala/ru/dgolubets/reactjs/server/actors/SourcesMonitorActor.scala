@@ -6,9 +6,10 @@ import java.nio.file.{Path, WatchEvent}
 import scala.concurrent.duration._
 
 import akka.actor.{Actor, ActorRef, Cancellable, Props}
+import akka.util.ByteString
 import better.files.{File => BetterFile}
 
-import ru.dgolubets.reactjs.server.util.{ExecutionContexts, FileMonitorEx}
+import ru.dgolubets.reactjs.server.util.{ExecutionContexts, FileMonitorEx, MD5}
 
 private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: Seq[File], delay: FiniteDuration) extends Actor {
 
@@ -48,7 +49,7 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
   def getFilesModified(): Map[File, Option[FileInfo]] = {
     files.map { file =>
       if (file.exists()) {
-        val info = FileInfo(file.lastModified(), BetterFile(file.toPath).md5)
+        val info = FileInfo(file.lastModified(), MD5.ofFile(file))
         file -> Some(info)
       } else file -> None
     }.toMap
@@ -97,5 +98,6 @@ private[server] object SourcesMonitorActor {
 
   object FileChanged
 
-  case class FileInfo(lastModified: Long, md5: String)
+  case class FileInfo(lastModified: Long, md5: ByteString)
+
 }
