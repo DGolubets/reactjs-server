@@ -1,43 +1,89 @@
 # reactjs-server
-Renders React.js classes with Nashorn in JVM
+Renders React.js markup (or any other string) on JVM with Graal or Nashorn.
+
+## Features
+* Graal.js on GraalVM with fallback to Nashorn on HotSpot
+* Multiple render instances
+* Watches source files and reloads automatically
 
 ## Setup
 ```
 resolvers += Resolver.bintrayRepo("dgolubets", "releases")
-libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.1.1"
+libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.2"
 ```
 
-## Usage
-The easy way is to use ReactServer class. It uses Akka to create a simple routing system with few render actors (defaults to the number of CPU cores). It creates daemonic actor system that won't block JVM from exiting. However you may want to shut it down explicitly, e.g. when you work with Play recompilation.
+## Minimal example
 ```scala
-val engine = new ReactServer(CommonJsLoader(FileModuleReader("src/test/javascript/")))
-val futureString = engine.render(CommentBox("http://comments.org", 1000))
-futureString.onComplete {
-  case _ => engine.shutdown()
+import akka.actor.ActorSystem
+import io.circe.Json
+
+import ru.dgolubets.reactjs.server._
+
+implicit val system = ActorSystem()
+
+import system.dispatcher
+
+val renderSource = ScriptSource.fromString(
+  """
+    |function render(state){
+    |  return "<h1>state.title</h1>"
+    |}
+  """.stripMargin)
+
+val renderServer = new RenderServer(RenderServerSettings(Seq(renderSource)))
+
+renderServer.render("render", Json.obj("title" -> Json.fromString("Some title"))).map { html =>
+  println(html)
 }
 ```
-It looks for a module with absolute id 'react', so it should be available to the loader.
 
-### Declaring React elements
-One way is to implement ReactElement trait.
+## Using Graal.js
+You don't have to do anything but to start your application with [GraalVM](http://www.graalvm.org/). ReactJS server will try to instantiate Graal.js context by default and if it's not available - will fallback to using Nashorn.
+
+## Providing polyfills
+ReactJS server comes with a minimal set of polyfills for logging via ```console```.
+The server will execute specified sources in the order provided, so it's easy to include your own polyfills by just adding them before your main script.
+
+## Watching file sources
+To watch for source file changes, specify watch settings with root pointing to some parent directory of your source files.
 ```scala
-case class CommentBox(url: String, pollingInterval: Int) extends ReactElement {
-  override val reactClass = ReactClass("./components/CommentBox")
-  override def props = Map("url" -> url, "pollingInterval" -> pollingInterval)
-}
+val renderSource = ScriptSource.fromFile(new File("path/to/my/source.js");
+
+val watchSettings = WatchSettings(
+  root = new File("path/to"), // watch root
+  delay = 1 second // delay to aggregate file changes
+)
+
+val renderServer = new RenderServer(RenderServerSettings(
+  Seq(renderSource), 
+  watch = Some(watchSettings)
+)
 ```
 
-Or if you want, you can use more dynamic way:
+## Starting multiple instances
+By default the server is gonna start an instance per CPU core, but you can override it.
 ```scala
-object MyReactClasses {
-	val CommentBox = ReactClass("./components/CommentBox")
-}
-
-import MyReactClasses._
-CommentBox.createElement("url" -> "some url", "pollingInterval" -> 120)
+val renderServer = new RenderServer(RenderServerSettings(
+  Seq(renderSource), 
+  nInstances = 2
+)
 ```
-
-It is also possible to use RenderActor directly if you want.
 
 ## Performance
-It takes the most of time to compile React.js and other scripts, obviously. This compilation will occur in a fresh ReactServer exacly the same numer of times as the number of render actors created (cpu cores number by default). This means it will take few calls to warm up.
+Both Graal.js and Nashorn can reach Node.js performance after a warmup (100-1000+ iterations per instance). Warm up times are likely to be improved in future Graal versions.
+
+## Using with Webpack
+Create a separate configuration to bundle a [library](https://webpack.js.org/configuration/output/#output-library):
+```javascript
+output: {
+  filename: "scripts/server.js",
+  library: "mylib",
+  libraryTarget: "var"
+}
+```
+Export a render function in your index source file:
+```javascript
+export function renderToString(state: any): string {
+    return ReactDOM.renderToString(<Root />);
+}
+```
