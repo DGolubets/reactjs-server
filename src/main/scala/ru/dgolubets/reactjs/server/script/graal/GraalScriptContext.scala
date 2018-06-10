@@ -23,7 +23,7 @@ private[server] class GraalScriptContext(context: Context) extends ScriptContext
   override def eval(code: String): ScriptValue = context.eval(lang, code)
 
   override def exportSymbol(name: String, value: Any): Unit = {
-    context.exportSymbol(name, value)
+    context.getPolyglotBindings.putMember(name, value)
   }
 
   override def close(): Unit = context.close()
