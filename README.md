@@ -9,7 +9,7 @@ Renders React.js markup (or any other string) on JVM with Graal or Nashorn.
 ## Setup
 ```
 resolvers += Resolver.bintrayRepo("dgolubets", "releases")
-libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.2"
+libraryDependencies += "ru.dgolubets" %% "reactjs-server" % "0.2.1"
 ```
 
 ## Minimal example
