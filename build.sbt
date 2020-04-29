@@ -5,7 +5,7 @@ name := "reactjs-server"
 organization := "ru.dgolubets"
 
 scalaVersion := "2.12.4"
-crossScalaVersions := List("2.11.6", "2.12.4")
+crossScalaVersions := List("2.12.4", "2.13.2")
 releaseCrossBuild := true
 
 scalacOptions ++= Seq("-feature", "-deprecation")
@@ -19,8 +19,8 @@ libraryDependencies ++= Seq(
   scalaLogging,
   Graal.sdk,
   Circe.core,
-  BetterFiles.core,
-  BetterFiles.akka,
+  BetterFiles.core(scalaVersion.value),
+  BetterFiles.akka(scalaVersion.value),
 
   // test
   scalaTest % Test,

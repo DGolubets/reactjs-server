@@ -23,7 +23,7 @@ private[server] class GraalScriptContext(context: Context) extends ScriptContext
   override def eval(code: String): ScriptValue = context.eval(lang, code)
 
   override def exportSymbol(name: String, value: Any): Unit = {
-    context.getPolyglotBindings.putMember(name, value)
+    context.getBindings(lang).putMember(name, value)
   }
 
   override def close(): Unit = context.close()
@@ -36,7 +36,7 @@ private[server] object GraalScriptContext {
   private implicit def wrapValue(value: Value): ScriptValue = GraalScriptValue(value)
 
   def apply(): GraalScriptContext = {
-    val ctx = Context.newBuilder(lang).build()
+    val ctx = Context.newBuilder(lang).allowAllAccess(true).build()
     new GraalScriptContext(ctx)
   }
 }

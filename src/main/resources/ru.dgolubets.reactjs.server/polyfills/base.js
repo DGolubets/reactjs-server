@@ -1,7 +1,7 @@
 (function (context) {
     context.global = context;
 
-    var logger = context.logger || Interop.import('logger');
+    var logger = context.logger;
 
     context.console = context.console || {};
 

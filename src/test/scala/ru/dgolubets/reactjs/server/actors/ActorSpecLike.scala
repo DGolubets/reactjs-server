@@ -5,6 +5,7 @@ import akka.testkit.{ImplicitSender, TestKit, TestKitBase, TestProbe}
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 trait ActorSpecLike extends TestKitBase with ImplicitSender with BeforeAndAfterAll {
   this: Suite =>

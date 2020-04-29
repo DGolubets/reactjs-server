@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   object Akka {
-    private val version = "2.5.11"
+    private val version = "2.6.4"
 
     val actors = "com.typesafe.akka" %% "akka-actor" % version
     val testkit = "com.typesafe.akka" %% "akka-testkit" % version
@@ -11,11 +11,11 @@ object Dependencies {
   }
 
   object Graal {
-    val sdk = "org.graalvm" % "graal-sdk" % "1.0.0-rc2"
+    val sdk = "org.graalvm.sdk" % "graal-sdk" % "20.0.0"
   }
 
   object Circe {
-    private val version = "0.9.1"
+    private val version = "0.12.3"
 
     val core = "io.circe" %% "circe-core" % version
     val generic = "io.circe" %% "circe-generic" % version
@@ -23,14 +23,15 @@ object Dependencies {
   }
 
   object BetterFiles {
-    private val version = "3.4.0"
-    val core = "com.github.pathikrit" %% "better-files" % version
-    val akka = "com.github.pathikrit"  %% "better-files-akka" % version
+    private def version(scalaVersion: String) = if(scalaVersion.startsWith("2.13.")) "3.8.0" else "3.6.0"
+
+    def core(scalaVersion: String) = "com.github.pathikrit" %% "better-files" % version(scalaVersion)
+    def akka(scalaVersion: String) = "com.github.pathikrit"  %% "better-files-akka" % version(scalaVersion)
   }
 
   val typesafeConfig = "com.typesafe" % "config" % "1.3.3"
-  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
-  val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4"
-  val scalaMock = "org.scalamock" %% "scalamock" % "4.1.0"
+  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
+  val scalaTest = "org.scalatest" %% "scalatest" % "3.1.1"
+  val scalaMock = "org.scalamock" %% "scalamock" % "4.4.0"
   val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"
 }
