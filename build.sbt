@@ -36,6 +36,7 @@ parallelExecution in Test := false
 bintrayRepository := "releases"
 bintrayOrganization in bintray := Some("dgolubets")
 bintrayPackageLabels := Seq("js", "react")
+bintrayVcsUrl := Some("git@github.com/DGolubets/reactjs-server")
 licenses += ("MIT", url("https://opensource.org/licenses/MIT"))
 homepage := Some(url("https://github.com/DGolubets/reactjs-server"))
 publishMavenStyle := true
