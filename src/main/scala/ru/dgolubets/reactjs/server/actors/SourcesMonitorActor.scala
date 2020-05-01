@@ -2,14 +2,15 @@ package ru.dgolubets.reactjs.server.actors
 
 import java.io.File
 import java.nio.file.{Path, WatchEvent}
+import java.util.concurrent.Executors
 
 import scala.concurrent.duration._
-
 import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import akka.util.ByteString
 import better.files.{File => BetterFile}
+import ru.dgolubets.reactjs.server.util.{FileMonitorEx, MD5}
 
-import ru.dgolubets.reactjs.server.util.{ExecutionContexts, FileMonitorEx, MD5}
+import scala.concurrent.ExecutionContext
 
 private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: Seq[File], delay: FiniteDuration) extends Actor {
 
@@ -17,6 +18,9 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
 
   import Messages._
   import SourcesMonitorActor._
+
+  private val blockingExecutor = Executors.newCachedThreadPool()
+  private val blockingIO: ExecutionContext = ExecutionContext.fromExecutor(blockingExecutor)
 
   private val watcher = new FileMonitorEx(root, recursive = true) {
 
@@ -37,13 +41,14 @@ private[server] class SourcesMonitorActor(server: ActorRef, root: File, files: S
     }
   }
 
-  watcher.start()(ExecutionContexts.blockingIO)
+  watcher.start()(blockingIO)
 
   private var filesModified: Map[File, Option[FileInfo]] = getFilesModified()
   notifyServer(filesModified, None)
 
   override def postStop(): Unit = {
     watcher.close()
+    blockingExecutor.shutdown()
   }
 
   def getFilesModified(): Map[File, Option[FileInfo]] = {
