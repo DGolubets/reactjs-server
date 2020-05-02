@@ -1,7 +1,7 @@
 package ru.dgolubets.reactjs.server.actors
 
 import akka.actor.SupervisorStrategy.{Escalate, Restart, Stop}
-import akka.actor.{Actor, ActorLogging, ActorRef, AllForOneStrategy, Props, Stash, Terminated}
+import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, Stash, Terminated}
 import akka.routing.RoundRobinPool
 import ru.dgolubets.reactjs.server.RenderServerSettings
 import ru.dgolubets.reactjs.server.script.FileScriptSource
@@ -19,7 +19,7 @@ private[server] class RenderServerActor(settings: RenderServerSettings) extends 
     context.actorOf(SourcesMonitorActor.props(self, watchSettings.root, files, watchSettings.delay))
   }
 
-  override val supervisorStrategy = AllForOneStrategy(0) {
+  override val supervisorStrategy = OneForOneStrategy(0) {
     case _: Throwable =>
       if (monitor.contains(sender)) {
         // if monitor fails for some reason - restart it
